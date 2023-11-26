@@ -1,0 +1,31 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  // CREATE EXTENSION IF NOT EXISTS pgcrypto; IS NEEDED WHEN WE USE gen_random_uuid
+  id       String    @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  email    String    @unique
+  password String
+  expenses Expense[]
+}
+
+model Expense {
+  // CREATE EXTENSION IF NOT EXISTS pgcrypto; IS NEEDED WHEN WE USE gen_random_uuid
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @map("_id") @db.Uuid
+  title     String
+  amount    Float
+  date      DateTime
+  dateAdded DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.Uuid
+}
