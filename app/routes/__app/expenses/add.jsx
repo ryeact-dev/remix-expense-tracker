@@ -1,5 +1,6 @@
 import ExpenseForm from '@/components/expenses/ExpenseForm';
 import Modal from '@/components/util/Modal';
+import { requireUserSession } from '@/data/auth.server';
 import { addExpense } from '@/data/expenses.server';
 import { validateExpenseInput } from '@/data/validation.server';
 import { redirect } from '@remix-run/node';
@@ -20,6 +21,8 @@ export default function AddExpensesPage() {
 }
 
 export async function action({ request }) {
+  const userId = await requireUserSession(request);
+
   const formData = await request.formData();
   // GET ALL THE DATA INPUTTED IN AN OBJECT FORM
   const expenseData = Object.fromEntries(formData);
@@ -30,6 +33,6 @@ export async function action({ request }) {
     return err;
   }
 
-  await addExpense(expenseData);
+  await addExpense(expenseData, userId);
   return redirect('/expenses');
 }

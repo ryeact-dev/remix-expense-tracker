@@ -1,4 +1,6 @@
 import AuthForm from '@/components/auth/AuthForm';
+import { login, signup } from '@/data/auth.server';
+import { validateCredentials } from '@/data/validation.server';
 import authStyles from '@/styles/auth.css';
 
 export default function AuthPage() {
@@ -12,10 +14,25 @@ export async function action({ request }) {
   const formData = await request.formData();
   const credentials = Object.fromEntries(formData);
 
-  if (authMode === 'login') {
-    // login logic
-  } else {
-    // signup logic (create user)
+  // YOU CAN CATCH THE ERROR USING useActionData IN YOU COMPONENT
+  try {
+    validateCredentials(credentials);
+  } catch (err) {
+    return err;
+  }
+
+  try {
+    if (authMode === 'login') {
+      return await login(credentials);
+    } else {
+      return await signup(credentials);
+    }
+  } catch (err) {
+    if (err.status == 422) {
+      return { credentials: err.message };
+    }
+    // HANDLE OTHER ERRORS
+    return { error: err.message };
   }
 }
 

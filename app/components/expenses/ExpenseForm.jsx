@@ -17,7 +17,7 @@ export default function ExpenseForm() {
   // USING useMatches TO GET A LOADER DATA FROM A ROUTE
   const matches = useMatches();
   const expenses = matches?.find(
-    (match) => match.id === 'routes/__app/expenses'
+    (route) => route.id === 'routes/__app/expenses'
   ).data;
   const expenseData = expenses.find((expense) => expense.id === params.id);
 

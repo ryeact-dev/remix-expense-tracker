@@ -6,6 +6,7 @@ import { FaPlus, FaDownload } from 'react-icons/fa';
 
 import ExpensesList from '@/components/expenses/ExpensesList';
 import { getExpenses } from '@/data/expenses.server';
+import { requireUserSession } from '@/data/auth.server';
 
 export default function ExpensesLayout() {
   // DATA FROM useLoaderData IS ALREADY A SERIALIZE JSON FILE
@@ -42,8 +43,12 @@ export default function ExpensesLayout() {
 }
 
 // LOADER FUNCTION TO BE CALLED BY THE MAIN FUNCTION ABOVE TO GET THE DATA
-export async function loader() {
-  const expenses = await getExpenses();
+export async function loader({ request }) {
+  // !MUST BE PRESENT IN ALL LOADERS FOR PARENT AND CHILDREN ON THIS COMPONENT
+  // !LOADERS ARE RUNNING IN PARALLEL
+  const userId = await requireUserSession(request);
+
+  const expenses = await getExpenses(userId);
 
   // if (!expenses || expenses.length === 0) {
   //   throw json(
@@ -54,7 +59,3 @@ export async function loader() {
 
   return expenses;
 }
-
-// export function CatchBoundary() {
-//   return <p>Error</p>;
-// }
